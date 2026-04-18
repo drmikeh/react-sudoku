@@ -20,10 +20,26 @@ export function isValidPlacement(board: number[][], row: number, col: number, di
   return true;
 }
 
-export function isSolved(_board: CellState[][], _solution: number[][]): boolean {
-  throw new Error('not implemented');
+export function isSolved(board: CellState[][], solution: number[][]): boolean {
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      const cell = board[row][col];
+      if (!cell.isClue && cell.value !== solution[row][col]) return false;
+    }
+  }
+  return true;
 }
 
-export function pickHintCell(_board: CellState[][], _solution: number[][]): [number, number] | null {
-  throw new Error('not implemented');
+export function pickHintCell(board: CellState[][], solution: number[][]): [number, number] | null {
+  const eligible: [number, number][] = [];
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      const cell = board[row][col];
+      if (!cell.isClue && cell.value !== solution[row][col]) {
+        eligible.push([row, col]);
+      }
+    }
+  }
+  if (eligible.length === 0) return null;
+  return eligible[Math.floor(Math.random() * eligible.length)];
 }
