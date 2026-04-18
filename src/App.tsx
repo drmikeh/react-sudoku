@@ -28,9 +28,24 @@ export default function App() {
     return () => clearTimeout(id);
   }, [state.lastChecked]);
 
+  const completedDigits = useMemo(() => {
+    const counts = new Array(10).fill(0);
+    for (const row of state.board) {
+      for (const cell of row) {
+        if (cell.value !== null) counts[cell.value]++;
+      }
+    }
+    const completed = new Set<number>();
+    for (let d = 1; d <= 9; d++) {
+      if (counts[d] === 9) completed.add(d);
+    }
+    return completed;
+  }, [state.board]);
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key >= '1' && e.key <= '9') {
-      dispatch({ type: 'ENTER_DIGIT', digit: parseInt(e.key) });
+      const digit = parseInt(e.key);
+      if (!completedDigits.has(digit)) dispatch({ type: 'ENTER_DIGIT', digit });
     } else if (e.key === 'Backspace' || e.key === 'Delete') {
       dispatch({ type: 'ERASE' });
     } else if (e.key === 'p') {
@@ -48,26 +63,12 @@ export default function App() {
       const [r, c] = state.selectedCell;
       if (c < 8) dispatch({ type: 'SELECT_CELL', row: r, col: c + 1 });
     }
-  }, [state.selectedCell]);
+  }, [state.selectedCell, completedDigits]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
-
-  const completedDigits = useMemo(() => {
-    const counts = new Array(10).fill(0);
-    for (const row of state.board) {
-      for (const cell of row) {
-        if (cell.value !== null) counts[cell.value]++;
-      }
-    }
-    const completed = new Set<number>();
-    for (let d = 1; d <= 9; d++) {
-      if (counts[d] === 9) completed.add(d);
-    }
-    return completed;
-  }, [state.board]);
 
   const handleNewGame = (difficulty: Difficulty) =>
     dispatch({ type: 'NEW_GAME', difficulty });
