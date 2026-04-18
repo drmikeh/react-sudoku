@@ -1,5 +1,5 @@
 import './App.css';
-import { useReducer, useEffect, useCallback, useState } from 'react';
+import { useReducer, useEffect, useCallback, useState, useMemo } from 'react';
 import { gameReducer, createInitialState } from './reducer';
 import type { Difficulty } from './types';
 import Board from './components/Board';
@@ -55,6 +55,20 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  const completedDigits = useMemo(() => {
+    const counts = new Array(10).fill(0);
+    for (const row of state.board) {
+      for (const cell of row) {
+        if (cell.value !== null) counts[cell.value]++;
+      }
+    }
+    const completed = new Set<number>();
+    for (let d = 1; d <= 9; d++) {
+      if (counts[d] === 9) completed.add(d);
+    }
+    return completed;
+  }, [state.board]);
+
   const handleNewGame = (difficulty: Difficulty) =>
     dispatch({ type: 'NEW_GAME', difficulty });
 
@@ -79,6 +93,7 @@ export default function App() {
       />
       <Controls
         pencilMode={state.pencilMode}
+        completedDigits={completedDigits}
         onDigit={d => dispatch({ type: 'ENTER_DIGIT', digit: d })}
         onErase={() => dispatch({ type: 'ERASE' })}
         onTogglePencil={() => dispatch({ type: 'TOGGLE_PENCIL_MODE' })}
