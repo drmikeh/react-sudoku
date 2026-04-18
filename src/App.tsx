@@ -1,5 +1,5 @@
 import './App.css';
-import { useReducer, useEffect, useCallback } from 'react';
+import { useReducer, useEffect, useCallback, useState } from 'react';
 import { gameReducer, createInitialState } from './reducer';
 import type { Difficulty } from './types';
 import Board from './components/Board';
@@ -7,15 +7,26 @@ import Controls from './components/Controls';
 import GameHeader from './components/GameHeader';
 import ActionBar from './components/ActionBar';
 import WinModal from './components/WinModal';
+import Toast from './components/Toast';
 
 export default function App() {
   const [state, dispatch] = useReducer(gameReducer, undefined, () => createInitialState('easy'));
+  const [toastVisible, setToastVisible] = useState(false);
 
   useEffect(() => {
     if (state.status !== 'playing') return;
     const id = setInterval(() => dispatch({ type: 'TICK' }), 1000);
     return () => clearInterval(id);
   }, [state.status]);
+
+  useEffect(() => {
+    if (!state.lastChecked || state.status === 'won') return;
+    const hasErrors = state.board.some(row => row.some(cell => cell.isError));
+    if (hasErrors) return;
+    setToastVisible(true);
+    const id = setTimeout(() => setToastVisible(false), 2500);
+    return () => clearTimeout(id);
+  }, [state.lastChecked]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key >= '1' && e.key <= '9') {
@@ -72,6 +83,7 @@ export default function App() {
         onErase={() => dispatch({ type: 'ERASE' })}
         onTogglePencil={() => dispatch({ type: 'TOGGLE_PENCIL_MODE' })}
       />
+      <Toast message="Looking good! Keep it up." visible={toastVisible} />
       {state.status === 'won' && (
         <WinModal
           elapsedSeconds={state.elapsedSeconds}
