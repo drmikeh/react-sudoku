@@ -60,6 +60,25 @@ describe('ENTER_DIGIT (pencil off)', () => {
     expect(next.board[2][3].value).toBe(7);
   });
 
+  it('removes the placed digit from candidates of peer cells (same row, col, box)', () => {
+    const board = Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => makeCell(null, false)));
+    // Peer in same row
+    board[0][5] = makeCell(null, false, false, [3, 7]);
+    // Peer in same col
+    board[4][0] = makeCell(null, false, false, [3, 5]);
+    // Peer in same box (top-left box: rows 0-2, cols 0-2)
+    board[2][2] = makeCell(null, false, false, [3, 1]);
+    // Non-peer: different row, col, and box
+    board[5][5] = makeCell(null, false, false, [3, 8]);
+    const state = makeState({ board, selectedCell: [0, 0] });
+    const next = gameReducer(state, { type: 'ENTER_DIGIT', digit: 3 });
+    expect(next.board[0][5].candidates.has(3)).toBe(false); // same row — removed
+    expect(next.board[0][5].candidates.has(7)).toBe(true);  // other candidates preserved
+    expect(next.board[4][0].candidates.has(3)).toBe(false); // same col — removed
+    expect(next.board[2][2].candidates.has(3)).toBe(false); // same box — removed
+    expect(next.board[5][5].candidates.has(3)).toBe(true);  // non-peer — unchanged
+  });
+
   it('is a no-op when no cell is selected', () => {
     const state = makeState({ selectedCell: null });
     const next = gameReducer(state, { type: 'ENTER_DIGIT', digit: 5 });

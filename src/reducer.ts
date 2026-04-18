@@ -49,6 +49,16 @@ export function gameReducer(state: GameState, action: Action): GameState {
         board[row][col] = { ...board[row][col], candidates };
       } else {
         board[row][col] = { ...board[row][col], value: action.digit, isError: false, candidates: new Set() };
+        const boxRow = Math.floor(row / 3) * 3;
+        const boxCol = Math.floor(col / 3) * 3;
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            if (r === row && c === col) continue;
+            if (r === row || c === col || (Math.floor(r / 3) * 3 === boxRow && Math.floor(c / 3) * 3 === boxCol)) {
+              board[r][c].candidates.delete(action.digit);
+            }
+          }
+        }
       }
       return { ...state, board, lastChecked: false };
     }
