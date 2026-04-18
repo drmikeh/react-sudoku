@@ -265,3 +265,37 @@ describe('NEW_GAME', () => {
     expect(next.difficulty).toBe('hard');
   });
 });
+
+describe('FILL_CANDIDATES', () => {
+  it('fills valid candidates for empty non-clue cells', () => {
+    // Minimal board: row 0 has digits 1-8 placed, leaving only 9 valid for (0,8)
+    const board: CellState[][] = Array.from({ length: 9 }, () =>
+      Array.from({ length: 9 }, () => makeCell(null, false))
+    );
+    for (let c = 0; c < 8; c++) board[0][c] = makeCell(c + 1, true);
+    const state = makeState({ board });
+    const next = gameReducer(state, { type: 'FILL_CANDIDATES' });
+    expect(next.board[0][8].candidates.has(9)).toBe(true);
+    expect(next.board[0][8].candidates.size).toBe(1);
+  });
+
+  it('skips cells that already have a value', () => {
+    const board: CellState[][] = Array.from({ length: 9 }, () =>
+      Array.from({ length: 9 }, () => makeCell(null, false))
+    );
+    board[0][0] = makeCell(5, false);
+    const state = makeState({ board });
+    const next = gameReducer(state, { type: 'FILL_CANDIDATES' });
+    expect(next.board[0][0].candidates.size).toBe(0);
+  });
+
+  it('skips clue cells', () => {
+    const board: CellState[][] = Array.from({ length: 9 }, () =>
+      Array.from({ length: 9 }, () => makeCell(null, false))
+    );
+    board[0][0] = makeCell(5, true);
+    const state = makeState({ board });
+    const next = gameReducer(state, { type: 'FILL_CANDIDATES' });
+    expect(next.board[0][0].candidates.size).toBe(0);
+  });
+});

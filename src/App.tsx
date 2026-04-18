@@ -64,6 +64,7 @@ export default function App() {
         hintsUsed={state.hintsUsed}
         onCheck={() => dispatch({ type: 'CHECK' })}
         onHint={() => dispatch({ type: 'HINT' })}
+        onFillCandidates={() => dispatch({ type: 'FILL_CANDIDATES' })}
       />
       <Controls
         pencilMode={state.pencilMode}

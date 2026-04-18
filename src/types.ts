@@ -28,4 +28,5 @@ export type Action =
   | { type: 'CHECK' }
   | { type: 'HINT' }
   | { type: 'TICK' }
-  | { type: 'NEW_GAME'; difficulty: Difficulty };
+  | { type: 'NEW_GAME'; difficulty: Difficulty }
+  | { type: 'FILL_CANDIDATES' };

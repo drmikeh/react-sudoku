@@ -139,6 +139,8 @@
 .action-bar__check:hover { background: #2b6cb0; }
 .action-bar__hint        { background: #ed8936; color: #fff; }
 .action-bar__hint:hover  { background: #dd6b20; }
+.action-bar__fill-candidates       { background: #805ad5; color: #fff; }
+.action-bar__fill-candidates:hover { background: #6b46c1; }
 
 /* ── Controls ── */
 .controls { display: flex; flex-direction: column; gap: 8px; }

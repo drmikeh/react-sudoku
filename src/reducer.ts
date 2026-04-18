@@ -1,5 +1,5 @@
 import { generatePuzzle } from './puzzleGenerator';
-import { pickHintCell } from './sudokuLogic';
+import { pickHintCell, isValidPlacement } from './sudokuLogic';
 import type { GameState, Action, Difficulty, CellState } from './types';
 
 function cloneBoard(board: CellState[][]): CellState[][] {
@@ -112,6 +112,24 @@ export function gameReducer(state: GameState, action: Action): GameState {
     case 'TICK':
       if (state.status === 'won') return state;
       return { ...state, elapsedSeconds: state.elapsedSeconds + 1 };
+
+    case 'FILL_CANDIDATES': {
+      const values = state.board.map(row => row.map(cell => cell.value ?? 0));
+      const board = cloneBoard(state.board);
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          const cell = board[r][c];
+          if (!cell.isClue && cell.value === null) {
+            const candidates = new Set<number>();
+            for (let d = 1; d <= 9; d++) {
+              if (isValidPlacement(values, r, c, d)) candidates.add(d);
+            }
+            board[r][c] = { ...cell, candidates };
+          }
+        }
+      }
+      return { ...state, board };
+    }
 
     case 'NEW_GAME':
       return createInitialState(action.difficulty);
