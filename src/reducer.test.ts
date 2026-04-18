@@ -84,6 +84,17 @@ describe('ENTER_DIGIT (pencil off)', () => {
     const next = gameReducer(state, { type: 'ENTER_DIGIT', digit: 5 });
     expect(next).toBe(state);
   });
+
+  it('sets status to won when the last cell is filled correctly', () => {
+    const solution = Array.from({ length: 9 }, (_, r) =>
+      Array.from({ length: 9 }, (_, c) => ((r * 9 + c) % 9) + 1)
+    );
+    const board: CellState[][] = solution.map(row => row.map(v => makeCell(v, false)));
+    board[8][8] = makeCell(null, false); // last cell empty
+    const state = makeState({ board, solution, selectedCell: [8, 8] });
+    const next = gameReducer(state, { type: 'ENTER_DIGIT', digit: solution[8][8] });
+    expect(next.status).toBe('won');
+  });
 });
 
 describe('ENTER_DIGIT (pencil on)', () => {

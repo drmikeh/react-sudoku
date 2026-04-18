@@ -6,6 +6,15 @@ function cloneBoard(board: CellState[][]): CellState[][] {
   return board.map(row => row.map(cell => ({ ...cell, candidates: new Set(cell.candidates) })));
 }
 
+function isBoardSolved(board: CellState[][], solution: number[][]): boolean {
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (board[r][c].value !== solution[r][c]) return false;
+    }
+  }
+  return true;
+}
+
 function createBoard(puzzle: (number | null)[][]): CellState[][] {
   return puzzle.map(row =>
     row.map(value => ({
@@ -60,7 +69,8 @@ export function gameReducer(state: GameState, action: Action): GameState {
           }
         }
       }
-      return { ...state, board, lastChecked: false };
+      const status = !state.pencilMode && isBoardSolved(board, state.solution) ? 'won' : state.status;
+      return { ...state, board, lastChecked: false, status };
     }
 
     case 'ERASE': {
@@ -106,7 +116,8 @@ export function gameReducer(state: GameState, action: Action): GameState {
         candidates: new Set(),
         isError: false,
       };
-      return { ...state, board, hintsUsed: state.hintsUsed + 1 };
+      const status = isBoardSolved(board, state.solution) ? 'won' : state.status;
+      return { ...state, board, hintsUsed: state.hintsUsed + 1, status };
     }
 
     case 'TICK':
