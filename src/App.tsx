@@ -20,7 +20,10 @@ export default function App() {
   }, [state.status]);
 
   useEffect(() => {
-    if (!state.lastChecked || state.status === 'won') return;
+    if (!state.lastChecked || state.status === 'won') {
+      setToastVisible(false);
+      return;
+    }
     const hasErrors = state.board.some(row => row.some(cell => cell.isError));
     if (hasErrors) return;
     setToastVisible(true);
