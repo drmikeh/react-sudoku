@@ -1,4 +1,5 @@
 import type { Difficulty } from '../types';
+import Confetti from './Confetti';
 
 type Props = {
   elapsedSeconds: number;
@@ -15,8 +16,10 @@ function formatTime(seconds: number): string {
 
 export default function WinModal({ elapsedSeconds, hintsUsed, difficulty, onNewGame }: Props) {
   return (
-    <div className="modal-overlay">
-      <div className="modal">
+    <>
+      <Confetti />
+      <div className="modal-overlay">
+      <div className="modal modal--win">
         <h2 className="modal__title">Puzzle Solved!</h2>
         <div className="modal__stats">
           <div className="modal__stat">
@@ -42,5 +45,6 @@ export default function WinModal({ elapsedSeconds, hintsUsed, difficulty, onNewG
         </div>
       </div>
     </div>
+    </>
   );
 }
